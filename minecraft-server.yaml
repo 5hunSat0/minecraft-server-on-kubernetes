@@ -72,6 +72,8 @@ spec:
           value: "TRUE"
         - name: DIFFICULTY
           value: normal
+        - name: SPAWN_PROTECTION
+          value: "16"
         - name: OPS
           valueFrom:
             secretKeyRef:
