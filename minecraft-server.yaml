@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecraft-server
+  labels:
+    app: minecraft-server
+spec:
+  ports:
+    - port: 25565
+      targetPort: 25565
+  selector:
+    app: minecraft-server
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-mc-claim
+  labels:
+    app: minecraft-server
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-mc-plugin-claim
+  labels:
+    app: minecraft-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecraft-server-deployment
+  labels:
+    app: minecraft-server
+spec:
+  selector:
+    matchLabels:
+      app: minecraft-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minecraft-server
+    spec:
+      containers:
+      - image: itzg/minecraft-server:multiarch
+        name: minecraft-server
+        env:
+        - name: EULA
+          value: "TRUE"
+        - name: TZ
+          value: Asia/Tokyo
+        - name: TYPE
+          value: PAPER
+        - name: OVERRIDE_SERVER_PROPERTIES
+          value: "TRUE"
+        - name: DIFFICULTY
+          value: normal
+        - name: OPS
+          valueFrom:
+            secretKeyRef:
+              name: mc-user
+              key: ops
+        - name: WHITELIST
+          valueFrom:
+            secretKeyRef:
+              name: mc-user
+              key: whitelist
+        - name: OVERRIDE_WHITELIST
+          value: "true"
+        - name: ANNOUNCE_PLAYER_ACHIEVEMENTS
+          value: "true" 
+        - name: REMOVE_OLD_MODS
+          value: "TRUE"
+        ports:
+        - containerPort: 25565
+        volumeMounts:
+        - name: minecraft-server-storage
+          mountPath: /data
+        - name: minecraft-plugins-dir
+          mountPath: /plugins
+      volumes:
+      - name: minecraft-server-storage
+        persistentVolumeClaim:
+          claimName: pv-mc-claim
+      - name: minecraft-plugins-dir
+        persistentVolumeClaim:
+          claimName: pv-mc-plugin-claim
