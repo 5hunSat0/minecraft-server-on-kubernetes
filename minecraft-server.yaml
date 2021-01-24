@@ -68,12 +68,12 @@ spec:
           value: Asia/Tokyo
         - name: TYPE
           value: PAPER
-        - name: OVERRIDE_SERVER_PROPERTIES
-          value: "TRUE"
+        # - name: OVERRIDE_SERVER_PROPERTIES
+        #   value: "TRUE"
         - name: DIFFICULTY
           value: normal
         - name: SPAWN_PROTECTION
-          value: "16"
+          value: "4"
         - name: OPS
           valueFrom:
             secretKeyRef:
