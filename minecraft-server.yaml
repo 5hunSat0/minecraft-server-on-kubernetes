@@ -90,6 +90,10 @@ spec:
           value: "true" 
         - name: REMOVE_OLD_MODS
           value: "TRUE"
+        - name: REMOVE_OLD_MODS_INCLUDE
+          value: "*.jar"
+        - name: REMOVE_OLD_MODS_DEPTH
+          value: "1"  
         ports:
         - containerPort: 25565
         volumeMounts:
